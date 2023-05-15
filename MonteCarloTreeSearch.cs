@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using ConnectFour;
-
-namespace ConnectFour
+﻿namespace ConnectFour
 {
 
     public class MonteCarloTreeSearch
@@ -91,15 +86,7 @@ namespace ConnectFour
         //SimulateRandomPlayout: This method should simulate a random playout from a node and then return the winning player.
         private void SimulateRandomPlayout(Node node)
         {
-            Node tempNode = new Node()
-            {
-                State = new State
-                {
-                    Board = (int[,])node.State.Board.Clone(),
-                    PlayerNo = node.State.PlayerNo
-                }
-            };
-
+            Node tempNode = new Node(new State((int[,])node.State.Board.Clone(), node.State.PlayerNo));
             State tempState = tempNode.State;
             int boardStatus = CheckBoardStatus(tempState);
 

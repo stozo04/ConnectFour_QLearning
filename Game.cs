@@ -1,5 +1,4 @@
 ﻿using ConnectFour;
-using System;
 
 public class Game
 {
@@ -7,11 +6,6 @@ public class Game
     private int currentPlayer; // Current player's turn (1 or 2)
     private bool isGameOver; // Flag to indicate if the game is over
     private MonteCarloTreeSearch mcts; // MCTS object
-
-    public int CurrentPlayer
-    {
-        get { return currentPlayer; }
-    }
 
     public Game()
     {
@@ -25,62 +19,53 @@ public class Game
         isGameOver = false;
     }
 
-    //public double PlayGame()
-    //{
-    //    board = new int[6, 7];
-    //    bool isGameOver = false;
-    //    double totalReward = 0.0;
-
-    //    while (!isGameOver)
-    //    {
-    //        int currentState = GetCurrentGameState();  // Default state
-    //        int action = ChooseAction(currentState);  // Default action
-    //        bool p1MoveSuccessful = false;
-    //        while (!p1MoveSuccessful)
-    //        {
-    //            currentState = GetCurrentGameState();
-    //            action = ChooseAction(currentState);
-    //            p1MoveSuccessful = MakeMove(action);
-    //        }
-
-
-    //        PrintBoard();
-    //        totalReward += GetReward();
-    //        int nextState = GetCurrentGameState();
-    //        qLearning.UpdateQValue(totalReward, currentState, nextState, action);
-
-    //        Console.Write("Player 1 Moved.");
-
-    //        // Player 2's move (you could use a random move, another AI, etc.)
-
-    //        bool p2MoveSuccessful = false;
-    //        while (!p2MoveSuccessful)
-    //        {
-    //            Random random = new Random();
-    //            int randomNumber = random.Next(0, 7); // Generates a random number between 0 and 6 (exclusive of 7)
-    //            p2MoveSuccessful = MakeMove(randomNumber);
-    //        }
-    //        PrintBoard();
-
-    //        Console.Write("Player 2 Moved.");
-    //    }
-
-    //    return totalReward;
-    //}
 
     public void PlayGame()
     {
         while (!isGameOver)
         {
-            State state = new State() { Board = this.board, PlayerNo = this.currentPlayer };
-            Node node = new Node() { State = state };
-            Tree tree = new Tree() { Root = node };
-
-            int action = mcts.FindNextMove(tree, -1);
-
-            MakeMove(action);
+            Console.Clear();
             PrintBoard();
-           // Console.Write("Player 1 Moved.");
+            if (currentPlayer == 1)
+            {
+                Console.Write("Your move (enter column number): ");
+                int move = Convert.ToInt32(Console.ReadLine());
+
+                // Check if the move is valid
+                while (!IsValidMove(move))
+                {
+                    Console.Write("Invalid move. Try again: ");
+                    move = Convert.ToInt32(Console.ReadLine());
+                }
+
+                MakeMove(move);
+                PrintBoard();
+                Console.Write("Player 1 Moved.");
+                if (CheckWinner())
+                {
+                    Console.WriteLine($"Player {currentPlayer} wins!");
+                    isGameOver = true;
+                }
+
+                if (CheckDraw())
+                {
+                    Console.WriteLine("The game is a draw.");
+                    isGameOver = true;
+                }
+
+            }
+            else
+            {
+                State state = new State(this.board, 2);
+                Node node = new Node(state);
+                Tree tree = new Tree(node);
+                int action = mcts.FindNextMove(tree, -1);
+                MakeMove(action);
+                PrintBoard();
+                Console.Write("Player 2 Moved.");
+
+            }
+
             if (CheckWinner())
             {
                 Console.WriteLine($"Player {currentPlayer} wins!");
@@ -97,10 +82,7 @@ public class Game
         }
     }
 
-
-
-
-    public bool MakeMove(int column)
+    public bool IsValidMove(int column)
     {
         // Check if the selected column is within the valid range
         if (column < 0 || column > 6)
@@ -116,6 +98,13 @@ public class Game
             return false;
         }
 
+        return true;
+    }
+
+    public void MakeMove(int column)
+    {
+      
+
         // Find the lowest available row in the column
         for (int row = 5; row >= 0; row--)
         {
@@ -123,27 +112,9 @@ public class Game
             {
                 // Place the current player's piece in the found row
                 board[row, column] = currentPlayer;
-
-                // Check if the game is won
-                if (CheckWinner())
-                {
-                    Console.WriteLine("The game is over.");
-                    isGameOver = true;
-                }
-
-                // Check for a draw
-                if (CheckDraw())
-                {
-                    Console.WriteLine("The game is a draw.");
-                    isGameOver = true;
-                }
-
-                return true;
             }
         }
 
-        // If no empty row was found in the selected column, the move is invalid
-        return false;
     }
 
     public void SwitchPlayer()
@@ -190,7 +161,6 @@ public class Game
         return true; // All spaces filled, game is a draw
     }
 
-
     public void PrintBoard()
     {
         for (int i = 0; i < 6; i++)
@@ -203,5 +173,29 @@ public class Game
         }
     }
 
+    private bool CheckLine(int row, int col, int dRow, int dCol)
+    {
+        // Starting from (row, col), checks for four identical pieces in the direction (dRow, dCol)
+        double start = board[row, col];
 
+        // Ignore lines that start with an empty cell
+        if (start == 0)
+        {
+            return false;
+        }
+
+        for (int i = 0; i < 4; i++)
+        {
+            int curRow = row + i * dRow;
+            int curCol = col + i * dCol;
+
+            // Check if out of bounds or not the same player
+            if (curRow < 0 || curRow >= 6 || curCol < 0 || curCol >= 7 || board[curRow, curCol] != start)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }

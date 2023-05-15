@@ -46,11 +46,7 @@
                         newBoard[i, j] = playerNo;
 
                         // Create a new state with the new board and the opponent's player number.
-                        State newState = new State
-                        {
-                            Board = newBoard,
-                            PlayerNo = playerNo == 1 ? 2 : 1
-                        };
+                        State newState = new State(newBoard, playerNo == 1 ? 2 : 1);
 
                         // Add this state to the list of possible states.
                         possibleStates.Add(newState);
