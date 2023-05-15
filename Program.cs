@@ -1,84 +1,52 @@
-﻿using System;
+﻿using ConnectFour;
+using System;
 
+int currentPlayer = 1; // Start with player 1
 Game game = new Game();
-game.TrainAndEvaluate();
+MonteCarloTreeSearch0o mcts = new MonteCarloTreeSearch();
 
-//int counter = 0;
-//while (true)
-//{
-//    Game game = new Game();
-//    int currentState = game.GetCurrentGameState();
+while (!game.IsGameOver())
+{
+    Console.Clear();
+    game.PrintBoard();
 
-//    try
-//    {
-//        while (true)
-//        {
-//            int action;
+    if (currentPlayer == 1)
+    {
+        // Human player's turn
+        Console.Write("Your move (enter column number): ");
+        int move = Convert.ToInt32(Console.ReadLine());
 
-//            // Player 1's turn (Human)
-//            if (game.CurrentPlayer == 1)
-//            {
-//                // Uncomment the following code if you want to have a human player
-//                /* 
-//                game.PrintBoard();
-//                Console.WriteLine("Enter a column number (0-6):");
-//                int column = Convert.ToInt32(Console.ReadLine());
-//                if (!game.MakeMove(column))
-//                {
-//                    Console.WriteLine("Invalid move, try again.");
-//                    continue;
-//                }
-//                */
+        // Check if the move is valid
+        while (!game.IsValidMove(move))
+        {
+            Console.Write("Invalid move. Try again: ");
+            move = Convert.ToInt32(Console.ReadLine());
+        }
 
-//                // AI playing as Player 1
-//                action = game.ChooseAction(currentState);
-//                if (!game.MakeMove(action))
-//                {
-//                    Console.WriteLine("Invalid move. AI made an invalid move.");
-//                    continue;
-//                }
-//            }
-//            // Player 2's turn (AI)
-//            else
-//            {
-//                action = game.ChooseAction(currentState);
-//                if (!game.MakeMove(action))
-//                {
-//                    Console.WriteLine("Invalid move. AI made an invalid move.");
-//                    continue;
-//                }
-//            }
+        game.MakeMove(move, currentPlayer);
+    }
+    else
+    {
+        // AI's turn
+        Console.WriteLine("AI is thinking...");
+        Tree tree = new Tree();
+        tree.Root = new Node { State = new State { Board = game.GetBoardCopy(), PlayerNo = currentPlayer } };
+        int aiMove = mcts.FindNextMove(tree, currentPlayer);
+        game.MakeMove(aiMove, currentPlayer);
+    }
 
-//            int nextState = game.GetCurrentGameState();
-//            double reward = game.GetReward();
+    // Switch player
+    currentPlayer = 3 - currentPlayer;
+}
 
-//            // Update the Q-value for the previous state-action pair using the Bellman equation
-//            game.UpdateQValue(reward, currentState, nextState, action);
+game.PrintBoard();
 
-//            currentState = nextState;
+if (game.GetWinner() == 0)
+{
+    Console.WriteLine("It's a draw!");
+}
+else
+{
+    Console.WriteLine($"Player {game.GetWinner()} has won the game!");
+}
 
-//            if (game.CheckWinner())
-//            {
-//                Console.WriteLine("Player " + game.CurrentPlayer + " wins!");
-//                break;
-//            }
-
-//            // Switch to the next player
-//            game.SwitchPlayer();
-//        }
-//    }
-//    catch (Exception ex)
-//    {
-//        Console.WriteLine("An error occurred: " + ex.Message);
-//        Console.WriteLine(ex.StackTrace);
-//    }
-
-//    counter++;
-//    Console.WriteLine("Game finished! Total games played: " + counter);
-//    if (counter == 100)
-//    {
-//        Console.WriteLine("Stopping after 100 games. Press any key to exit...");
-//        Console.ReadLine();
-//        break;
-//    }
-//}
