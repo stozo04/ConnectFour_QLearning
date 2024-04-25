@@ -4,7 +4,7 @@
     public class MCTS
     {
         private readonly Random random;
-        private const int iterations = 4000;
+        private const int iterations = 10000;
         private const double explorationConstant = 2;
 
         public MCTS()
@@ -17,7 +17,7 @@
             TreeNode root = new TreeNode(board, null);
             if (!root.IsTerminal)
             {
-                for (var i = 0; i < 50 && !root.IsTerminal; i++)
+                for (var i = 0; i < iterations && !root.IsTerminal; i++)
                 {
                     TreeNode selectedNode = Select(root);
                     TreeNode expandedNode = Expand(selectedNode);
@@ -76,6 +76,12 @@
                 {
                     newNode = new TreeNode(possibleStates[random.Next(possibleStates.Count)], node);
                     alreadyAdded = node.Children.ContainsKey(ComputeMoveKey(node.Board, newNode.Board));
+                    if (node.Children.Count == possibleStates.Count)
+                    {
+                        alreadyAdded = false;
+                        node.IsFullyExpanded = true;
+                        return node;
+                    }
                 } while (alreadyAdded);
 
                 node.Children.Add(ComputeMoveKey(node.Board, newNode.Board), newNode);
@@ -119,7 +125,7 @@
                     board = availableStates[random.Next(availableStates.Count)];
                 }
 
-                return (board.IsWinner(board) && board.CurrentPlayer == "Black") ? -1 : 1;
+                return (board.IsWinner(board) && board.CurrentPlayer == "o") ? -1 : 1;
             }
             catch (Exception e)
             {

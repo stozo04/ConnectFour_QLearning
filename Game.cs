@@ -19,8 +19,8 @@ public class Board
         if (board == null)
         {
             // initialize players
-            Player1 = "RED";
-            Player2 = "BLACK";
+            Player1 = "x";
+            Player2 = "o";
             EmptySpot = EmptySpot;
             CurrentPlayer = Player1;
             // define board position
@@ -61,7 +61,7 @@ public class Board
         Board newBoard = new Board();
         Console.WriteLine("\n   Connect Four by Steven Gates\n");
         Console.WriteLine("   Type 'exit' to quit the game");
-        Console.WriteLine("   Move format [x,y]: 1,2 where 1 is column and 2 is row.");
+        Console.WriteLine("   Select column: 0 being first column and 6 the last\n");
 
         // Print Board
         Print();
@@ -69,8 +69,6 @@ public class Board
         while (!isGameOver)
         {
             var userInput = Console.ReadLine().ToLower();
-
-            Console.WriteLine($"User Input: {userInput}");
 
             // Check if user wants to exit
             if (userInput == "exit") { Environment.Exit(0); }
@@ -97,12 +95,10 @@ public class Board
                 {
                     break;
                 }
-                Console.WriteLine($"{CurrentPlayer} made move {newBoard.SelectedPosition}");
+                //Console.WriteLine($"\n {CurrentPlayer} made move {newBoard.SelectedPosition}");
                 Position = newBoard.Position;
-                newBoard.Print();
                 newBoard.CurrentPlayer = Player2;
-
-                Console.WriteLine($"Current Player: {CurrentPlayer}");
+                newBoard.Print();
                 // Make AI move on board
 
                 // 1. Search for the best move
@@ -114,7 +110,6 @@ public class Board
                     newBoard = bestMove.Board;
                     Position = newBoard.Position;
                     CurrentPlayer = newBoard.Player1;
-                    Console.WriteLine($"Current Player: {CurrentPlayer}");
                     // Print Board
                     newBoard.Print();
                 }
@@ -339,13 +334,13 @@ public class Board
         Console.WriteLine($"{boardString}");
 
         string playerString = String.Empty;
-        if (Player1 == "RED")
+        if (CurrentPlayer == "x")
         {
-            playerString = $"\n ---------- \n 'RED' Turn: \n ---------- \n";
+            playerString = $"\n ---------- \n 'x' Turn: \n ---------- \n";
         }
         else
         {
-            playerString = $"\n ---------- \n 'BLACK' Turn: \n ---------- \n";
+            playerString = $"\n ---------- \n 'o' Turn: \n ---------- \n";
         }
         Console.WriteLine($"{playerString}");
     }
