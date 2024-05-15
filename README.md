@@ -1,1 +1,1 @@
-# ConnectFour_QLearning
+# ConnectFour_MinMax
